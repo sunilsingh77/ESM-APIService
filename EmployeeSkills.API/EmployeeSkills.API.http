@@ -1,0 +1,129 @@
+@EmployeeSkills.API_HostAddress = https://localhost:5001
+@accessToken = 
+@userId = 
+
+### Login with Admin credentials
+POST {{EmployeeSkills.API_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@localhost",
+  "password": "Admin123!"
+}
+
+###
+
+### Get Dashboard (requires authentication)
+GET {{EmployeeSkills.API_HostAddress}}/api/home/dashboard
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+###
+
+### Admin Only Endpoint
+GET {{EmployeeSkills.API_HostAddress}}/api/home/admin-only
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+###
+
+### Manager or Admin Endpoint
+GET {{EmployeeSkills.API_HostAddress}}/api/home/manager-or-admin
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+###
+
+### Employee Access Endpoint
+GET {{EmployeeSkills.API_HostAddress}}/api/home/employee
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+###
+
+### USER MANAGEMENT ENDPOINTS (Admin only)
+
+### Get all roles
+GET {{EmployeeSkills.API_HostAddress}}/api/usermanagement/roles/list
+Accept: application/json
+
+###
+
+### Get all users
+GET {{EmployeeSkills.API_HostAddress}}/api/usermanagement
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+###
+
+### Get user by ID
+GET {{EmployeeSkills.API_HostAddress}}/api/usermanagement/{{userId}}
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+###
+
+### Create new user with Employee role
+POST {{EmployeeSkills.API_HostAddress}}/api/usermanagement
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "email": "employee@localhost",
+  "userName": "employee1",
+  "password": "Employee123!",
+  "roles": ["Employee"]
+}
+
+###
+
+### Create new user with Manager role
+POST {{EmployeeSkills.API_HostAddress}}/api/usermanagement
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "email": "manager@localhost",
+  "userName": "manager1",
+  "password": "Manager123!",
+  "roles": ["Manager"]
+}
+
+###
+
+### Update user email and roles
+PUT {{EmployeeSkills.API_HostAddress}}/api/usermanagement/{{userId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "email": "newemail@localhost",
+  "roles": ["Manager", "Employee"]
+}
+
+###
+
+### Assign role to user
+POST {{EmployeeSkills.API_HostAddress}}/api/usermanagement/{{userId}}/roles
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "role": "Manager"
+}
+
+###
+
+### Remove role from user
+DELETE {{EmployeeSkills.API_HostAddress}}/api/usermanagement/{{userId}}/roles/Employee
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+###
+
+### Delete user
+DELETE {{EmployeeSkills.API_HostAddress}}/api/usermanagement/{{userId}}
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+###

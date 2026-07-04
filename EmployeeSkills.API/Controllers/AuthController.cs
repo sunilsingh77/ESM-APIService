@@ -123,5 +123,24 @@ namespace EmployeeSkills.API.Controllers
             }
             finally { }
         }
+
+        [Authorize]
+        [HttpGet("validate")]
+        public async Task<IActionResult> Validate()
+        {
+            // Return basic current user info to confirm the token is valid
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Unauthorized();
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            return Ok(new
+            {
+                id = user.Id,
+                email = user.Email,
+                userName = user.UserName,
+                roles = roles
+            });
+        }
     }
 }

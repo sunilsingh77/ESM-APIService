@@ -1,7 +1,0 @@
-<Solution>
-  <Project Path="EmployeeSkills.API/EmployeeSkills.API.csproj" />
-  <Project Path="EmployeeSkills.Application/EmployeeSkills.Application.csproj" />
-  <Project Path="EmployeeSkills.Domain/EmployeeSkills.Domain.csproj" />
-  <Project Path="EmployeeSkills.Infrastructure/EmployeeSkills.Infrastructure.csproj" />
-  <Project Path="EmployeeSkills.Tests/EmployeeSkills.Tests.csproj" />
-</Solution>

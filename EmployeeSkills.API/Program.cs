@@ -79,7 +79,7 @@ var app = builder.Build();
 
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
-// Seed roles and admin
+//// Seed roles and admin
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;

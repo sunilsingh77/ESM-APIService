@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EmployeeSkills.Application.DTOs.Skill
+﻿namespace EmployeeSkills.Application.DTOs.Skill
 {
     public class UpdateSkillDto
     {

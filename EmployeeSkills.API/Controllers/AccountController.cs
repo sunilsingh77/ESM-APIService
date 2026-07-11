@@ -1,7 +1,8 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Identity;
 using EmployeeSkills.Application.DTOs;
+using EmployeeSkills.Application.DTOs.Authentication;
 using EmployeeSkillsSummary.Domain.Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 
 namespace EmployeeSkills.API.Controllers
 {
@@ -24,7 +25,7 @@ namespace EmployeeSkills.API.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterDto dto)
+        public async Task<IActionResult> Register([FromBody] UserRegisterRequest dto)
         {
             try
             {
@@ -64,7 +65,7 @@ namespace EmployeeSkills.API.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginDto dto)
+        public async Task<IActionResult> Login([FromBody] UserLoginRequest dto)
         {
             try
             {

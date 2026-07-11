@@ -1,5 +1,4 @@
-﻿using EmployeeSkills.Domain.Entities;
-using EmployeeSkills.Domain.Repositories;
+﻿using EmployeeSkills.Domain.Repositories;
 using EmployeeSkills.Infrastructure.Persistence;
 using EmployeeSkillsSummary.Domain.Entities;
 using Microsoft.EntityFrameworkCore;

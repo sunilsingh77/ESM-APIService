@@ -1,5 +1,4 @@
-﻿using EmployeeSkills.Domain.Entities;
-using EmployeeSkillsSummary.Domain.Entities;
+﻿using EmployeeSkillsSummary.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

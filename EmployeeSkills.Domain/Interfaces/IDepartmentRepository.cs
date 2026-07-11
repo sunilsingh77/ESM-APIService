@@ -1,10 +1,4 @@
-﻿using EmployeeSkills.Domain.Entities;
-using EmployeeSkillsSummary.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using EmployeeSkillsSummary.Domain.Entities;
 
 namespace EmployeeSkills.Domain.Repositories
 {

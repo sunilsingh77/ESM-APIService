@@ -1,90 +1,54 @@
-using System.Security.Claims;
+using EmployeeSkills.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Identity;
-using EmployeeSkillsSummary.Domain.Entities;
 
-namespace EmployeeSkills.API.Controllers
+namespace EmployeeSkills.API.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+[Authorize]
+public class HomeController : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    [Authorize]
-    public class HomeController : ControllerBase
+    private readonly IHomeService _service;
+
+    public HomeController(IHomeService service)
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        _service = service;
+    }
 
-        public HomeController(UserManager<ApplicationUser> userManager)
+    [HttpGet("dashboard")]
+    public async Task<IActionResult> Dashboard()
+    {
+        return Ok(await _service.GetDashboardAsync(User));
+    }
+
+    [HttpGet("admin-only")]
+    [Authorize(Roles = "Admin")]
+    public IActionResult AdminOnly()
+    {
+        return Ok(new
         {
-            _userManager = userManager;
-        }
+            Message = "Admin access granted"
+        });
+    }
 
-        [HttpGet("dashboard")]
-        public async Task<IActionResult> GetDashboard()
+    [HttpGet("manager-or-admin")]
+    [Authorize(Roles = "Manager,Admin")]
+    public IActionResult ManagerOrAdmin()
+    {
+        return Ok(new
         {
-            try
-            {
-                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                var user = await _userManager.FindByIdAsync(userId ?? string.Empty);
-                if (user == null) return Unauthorized();
+            Message = "Manager or Admin access granted"
+        });
+    }
 
-                var roles = await _userManager.GetRolesAsync(user);
-                return Ok(new
-                {
-                    message = $"Welcome {user.UserName}!",
-                    email = user.Email,
-                    roles = roles
-                });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { title = "Server error", message = ex.Message, status = 500 });
-            }
-            finally { }
-        }
-
-        [HttpGet("admin-only")]
-        [Authorize(Roles = "Admin")]
-        public IActionResult AdminOnly()
+    [HttpGet("employee")]
+    [Authorize(Roles = "Employee,Manager,Admin")]
+    public IActionResult Employee()
+    {
+        return Ok(new
         {
-            try
-            {
-                return Ok(new { message = "Admin access granted" });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { title = "Server error", message = ex.Message, status = 500 });
-            }
-            finally { }
-        }
-
-        [HttpGet("manager-or-admin")]
-        [Authorize(Roles = "Manager,Admin")]
-        public IActionResult ManagerOrAdmin()
-        {
-            try
-            {
-                return Ok(new { message = "Manager or Admin access granted" });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { title = "Server error", message = ex.Message, status = 500 });
-            }
-            finally { }
-        }
-
-        [HttpGet("employee")]
-        [Authorize(Roles = "Employee,Manager,Admin")]
-        public IActionResult EmployeeAccess()
-        {
-            try
-            {
-                return Ok(new { message = "Employee access granted" });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { title = "Server error", message = ex.Message, status = 500 });
-            }
-            finally { }
-        }
+            Message = "Employee access granted"
+        });
     }
 }

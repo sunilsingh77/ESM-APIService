@@ -1,17 +1,17 @@
-﻿using EmployeeSkills.Application.DTOs.Account;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using EmployeeSkills.Application.Authentication.DTOs;
+using EmployeeSkills.Application.DTOs.Authentication;
+using System.Security.Claims;
 
 namespace EmployeeSkills.Application.Interfaces
 {
-    //public interface IAuthService
-    //{
-    //    Task<AuthResponse> RegisterAsync(RegisterRequest request);
-    //    Task<AuthResponse> LoginAsync(LoginRequest request);
-    //    Task<AuthResponse> RefreshTokenAsync(string refreshToken);
-    //    Task LogoutAsync(string userId);
-    //}
+    public interface IAuthService
+    {
+        Task<AuthenticationResponse> RegisterAsync(UserRegisterRequest dto);
+        Task<AuthenticationResponse> LoginAsync(UserLoginRequest dto);
+        Task<AuthenticationResponse> RefreshTokenAsync(RefreshTokenRequest dto);
+        Task LogoutAsync(RefreshTokenRequest dto);
+        Task<UserProfileResponse> ValidateAsync(ClaimsPrincipal user);
+    }
 }
+
+

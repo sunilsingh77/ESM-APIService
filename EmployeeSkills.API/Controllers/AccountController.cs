@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
-using EmployeeSkills.API.Models;
-using EmployeeSkills.API.Models.DTOs;
+using EmployeeSkills.Application.DTOs;
+using EmployeeSkillsSummary.Domain.Entities;
 
 namespace EmployeeSkills.API.Controllers
 {
@@ -35,6 +35,7 @@ namespace EmployeeSkills.API.Controllers
                     return BadRequest("Email and password are required");
 
                 var user = new ApplicationUser { UserName = dto.UserName, Email = dto.Email };
+
                 var result = await _userManager.CreateAsync(user, dto.Password);
 
                 if (!result.Succeeded)

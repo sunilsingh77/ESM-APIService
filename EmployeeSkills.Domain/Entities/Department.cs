@@ -1,13 +1,28 @@
-namespace EmployeeSkills.Domain.Entities
+using EmployeeSkills.Domain.Entities;
+namespace EmployeeSkillsSummary.Domain.Entities;
+public class Department
 {
-    public class Department
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+    public int Id { get; private set; }
+    public string Name { get; private set; }
+    public string Description { get; private set; }
+    public DateTime CreatedDate { get; private set; }
+    public ICollection<Employee> Employees { get; private set; }
+        = new List<Employee>();
 
-        // Navigation property
-        public ICollection<Employee> Employees { get; set; } = new List<Employee>();
+    private Department()
+    {
+    }
+
+    public Department(string name, string description)
+    {
+        Name = name;
+        Description = description;
+        CreatedDate = DateTime.UtcNow;
+    }
+
+    public void Update(string name, string description)
+    {
+        Name = name;
+        Description = description;
     }
 }

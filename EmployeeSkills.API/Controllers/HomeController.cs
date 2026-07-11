@@ -2,7 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
-using EmployeeSkills.API.Models;
+using EmployeeSkillsSummary.Domain.Entities;
 
 namespace EmployeeSkills.API.Controllers
 {

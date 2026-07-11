@@ -1,4 +1,4 @@
-namespace EmployeeSkills.API.Models.DTOs
+namespace EmployeeSkills.Application.DTOs
 {
     public class DepartmentDto
     {

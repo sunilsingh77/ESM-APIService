@@ -3,12 +3,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
-using EmployeeSkills.API.Models;
 using EmployeeSkills.API.Data;
-using EmployeeSkills.API.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
+using EmployeeSkillsSummary.Domain.Entities;
+using EmployeeSkills.Application.Services;
+using EmployeeSkills.Domain.Entities;
 
 namespace EmployeeSkills.API.Controllers
 {
@@ -19,9 +20,9 @@ namespace EmployeeSkills.API.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly EmployeeSkillsDbContext _dbContext;
-        private readonly JwtService _jwtService;
+        private readonly AuthService _jwtService;
 
-        public AuthController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, EmployeeSkillsDbContext dbContext, JwtService jwtService)
+        public AuthController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, EmployeeSkillsDbContext dbContext, AuthService jwtService)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -47,13 +48,10 @@ namespace EmployeeSkills.API.Controllers
                 var accessToken = _jwtService.GenerateAccessToken(user, roles);
                 var refreshToken = _jwtService.GenerateRefreshToken();
 
-                var rt = new RefreshToken
-                {
-                    Token = refreshToken,
-                    Expires = DateTime.UtcNow.AddDays(7),
-                    Created = DateTime.UtcNow,
-                    UserId = user.Id
-                };
+                var rt = new RefreshToken(
+                                            refreshToken,
+                                            DateTime.UtcNow.AddDays(7),
+                                            user.Id);
 
                 _dbContext.RefreshTokens.Add(rt);
                 await _dbContext.SaveChangesAsync();
@@ -78,19 +76,15 @@ namespace EmployeeSkills.API.Controllers
                 var user = await _userManager.FindByIdAsync(existing.UserId);
                 if (user == null) return Unauthorized();
 
-                existing.Revoked = DateTime.UtcNow;
+                existing.Revoke();
 
                 var roles = await _userManager.GetRolesAsync(user);
                 var accessToken = _jwtService.GenerateAccessToken(user, roles);
                 var refreshToken = _jwtService.GenerateRefreshToken();
 
-                var newRt = new RefreshToken
-                {
-                    Token = refreshToken,
-                    Expires = DateTime.UtcNow.AddDays(7),
-                    Created = DateTime.UtcNow,
-                    UserId = user.Id
-                };
+                var newRt = new RefreshToken(refreshToken,
+                                            DateTime.UtcNow.AddDays(7),
+                                            user.Id);
 
                 _dbContext.RefreshTokens.Add(newRt);
                 await _dbContext.SaveChangesAsync();
@@ -113,7 +107,7 @@ namespace EmployeeSkills.API.Controllers
                 var existing = await _dbContext.RefreshTokens.SingleOrDefaultAsync(x => x.Token == model.RefreshToken);
                 if (existing == null) return NotFound();
 
-                existing.Revoked = DateTime.UtcNow;
+                existing.Revoke();
                 await _dbContext.SaveChangesAsync();
                 return NoContent();
             }

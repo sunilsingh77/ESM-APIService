@@ -1,12 +1,61 @@
+using EmployeeSkills.API.Data;
+using EmployeeSkills.Application.DTOs.Department;
+using EmployeeSkills.Application.Interfaces;
+using EmployeeSkills.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using EmployeeSkills.API.Data;
-using EmployeeSkills.API.Models.DTOs;
-using EmployeeSkills.Domain.Entities;
 
 namespace EmployeeSkills.API.Controllers
 {
     [ApiController]
+    [Route("api/[controller]")]
+    public class DepartmentController : ControllerBase
+    {
+        private readonly IDepartmentService _service;
+
+        public DepartmentController(IDepartmentService service)
+        {
+            _service = service;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetDepartments()
+        {
+            return Ok(await _service.GetAllAsync());
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetDepartment(int id)
+        {
+            var department = await _service.GetByIdAsync(id);
+            if (department == null)
+                return NotFound();
+            return Ok(department);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateDepartment(CreateDepartmentDto dto)
+        {
+            var id = await _service.CreateAsync(dto);
+            return CreatedAtAction(nameof(GetDepartment), new { id }, null);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateDepartment(int id, UpdateDepartmentDto dto)
+        {
+            await _service.UpdateAsync(id, dto);
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteDepartment(int id)
+        {
+            await _service.DeleteAsync(id);
+            return NoContent();
+        }
+    }
+    
+    /*[ApiController]
     [Route("api/[controller]")]
     public class DepartmentsController : ControllerBase
     {
@@ -141,4 +190,5 @@ namespace EmployeeSkills.API.Controllers
             finally { }
         }
     }
+    */
 }

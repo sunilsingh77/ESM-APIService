@@ -1,12 +1,10 @@
-using System;
-using System.Collections.Generic;
+
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using EmployeeSkills.API.Models;
+using EmployeeSkills.Infrastructure.Models;
 
 namespace EmployeeSkills.API.Services
 {
@@ -18,7 +16,6 @@ namespace EmployeeSkills.API.Services
         {
             _config = config;
         }
-
         public string GenerateAccessToken(ApplicationUser user, IList<string> roles)
         {
             var jwtSection = _config.GetSection("Jwt");
@@ -44,7 +41,6 @@ namespace EmployeeSkills.API.Services
             var token = new JwtSecurityToken(issuer, audience, claims, expires: DateTime.UtcNow.AddMinutes(expiryMinutes), signingCredentials: credentials);
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-
         public string GenerateRefreshToken()
         {
             var randomNumber = new byte[64];

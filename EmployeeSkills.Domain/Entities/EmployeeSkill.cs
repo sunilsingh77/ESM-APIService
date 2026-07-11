@@ -1,27 +1,40 @@
-namespace EmployeeSkills.Domain.Entities
+namespace EmployeeSkills.Domain.Entities;
+
+public class EmployeeSkill
 {
-    public class EmployeeSkill
+    public int Id { get; private set; }
+    public int EmployeeId { get; private set; }
+    public int SkillId { get; private set; }
+    public string ProficiencyLevel { get; private set; }
+    public int YearsOfExperience { get; private set; }
+    public bool IsPrimary { get; private set; }
+    public DateTime AcquiredDate { get; private set; }
+    public DateTime? LastUpdatedDate { get; private set; }
+    public Employee Employee { get; private set; }
+    public Skill Skill { get; private set; }
+    private EmployeeSkill() { }
+    public EmployeeSkill(
+        int employeeId,
+        int skillId,
+        string proficiencyLevel,
+        int yearsOfExperience,
+        bool isPrimary)
     {
-        public int Id { get; set; }
-
-        // Foreign Keys
-        public int EmployeeId { get; set; }
-        public int SkillId { get; set; }
-
-        // Skill Level (e.g., Beginner, Intermediate, Advanced, Expert)
-        public string ProficiencyLevel { get; set; }
-
-        // Years of experience with this skill
-        public int YearsOfExperience { get; set; }
-
-        // Whether this is a primary skill for the employee
-        public bool IsPrimary { get; set; } = false;
-
-        public DateTime AcquiredDate { get; set; } = DateTime.UtcNow;
-        public DateTime? LastUpdatedDate { get; set; }
-
-        // Navigation properties
-        public Employee Employee { get; set; }
-        public Skill Skill { get; set; }
+        EmployeeId = employeeId;
+        SkillId = skillId;
+        ProficiencyLevel = proficiencyLevel;
+        YearsOfExperience = yearsOfExperience;
+        IsPrimary = isPrimary;
+        AcquiredDate = DateTime.UtcNow;
+    }
+    public void Update(
+        string proficiencyLevel,
+        int yearsOfExperience,
+        bool isPrimary)
+    {
+        ProficiencyLevel = proficiencyLevel;
+        YearsOfExperience = yearsOfExperience;
+        IsPrimary = isPrimary;
+        LastUpdatedDate = DateTime.UtcNow;
     }
 }

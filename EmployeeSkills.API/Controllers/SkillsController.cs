@@ -1,12 +1,58 @@
+using EmployeeSkills.API.Data;
+using EmployeeSkills.Application.DTOs.Skill;
+using EmployeeSkills.Application.Interfaces;
+using EmployeeSkills.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using EmployeeSkills.API.Data;
-using EmployeeSkills.API.Models.DTOs;
-using EmployeeSkills.Domain.Entities;
 
-namespace EmployeeSkills.API.Controllers
+namespace EmployeeSkills.API.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class SkillController : ControllerBase
 {
-    [ApiController]
+    private readonly ISkillService _service;
+
+    public SkillController(ISkillService service)
+    {
+        _service = service;
+    }
+    [HttpGet]
+    public async Task<IActionResult> GetSkills()
+    {
+        return Ok(await _service.GetAllAsync());
+    }
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> GetSkill(int id)
+    {
+        var skill = await _service.GetByIdAsync(id);
+        if (skill == null)
+            return NotFound();
+        return Ok(skill);
+    }
+    [HttpPost]
+    public async Task<IActionResult> CreateSkill(CreateSkillDto dto)
+    {
+        var id = await _service.CreateAsync(dto);
+        return CreatedAtAction(nameof(GetSkill), new { id }, null);
+    }
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> UpdateSkill(int id, UpdateSkillDto dto)
+    {
+        await _service.UpdateAsync(id, dto);
+
+        return NoContent();
+    }
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> DeleteSkill(int id)
+    {
+        await _service.DeleteAsync(id);
+
+        return NoContent();
+    }
+}
+
+    /*[ApiController]
     [Route("api/[controller]")]
     public class SkillsController : ControllerBase
     {
@@ -145,5 +191,5 @@ namespace EmployeeSkills.API.Controllers
             }
             finally { }
         }
-    }
-}
+    }*/
+

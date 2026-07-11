@@ -1,13 +1,18 @@
 using EmployeeSkills.API.Data;
-using EmployeeSkills.API.Models;
-using EmployeeSkills.API.Services;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using Swashbuckle.AspNetCore.SwaggerGen;
-using System.Text;
 using EmployeeSkills.API.Middleware;
+using EmployeeSkills.Application.Interfaces;
+using EmployeeSkills.Application.Services;
+using EmployeeSkills.Domain.Repositories;
+using EmployeeSkills.Infrastructure.Data;
+using EmployeeSkills.Infrastructure.Repositories;
+using EmployeeSkillsSummary.Domain.Entities;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,7 +30,14 @@ builder.Services.AddCors(options =>
 });
 // Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Employee Skills API",
+        Version = "v1"
+    });
+});
 
 // Configure DbContext
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -72,13 +84,16 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddScoped<JwtService>();
-
+builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
+builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+builder.Services.AddScoped<ISkillRepository, SkillRepository>();
+builder.Services.AddScoped<ISkillService, SkillService>();
 
 var app = builder.Build();
-
 app.UseMiddleware<GlobalExceptionMiddleware>();
-
 //// Seed roles and admin
 using (var scope = app.Services.CreateScope())
 {
@@ -97,7 +112,10 @@ using (var scope = app.Services.CreateScope())
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Employee Skills API v1");
+    });
 }
 
 app.UseHttpsRedirection();

@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using EmployeeSkills.API.Models;
+using EmployeeSkillsSummary.Domain.Entities;
 
 namespace EmployeeSkills.API.Data
 {

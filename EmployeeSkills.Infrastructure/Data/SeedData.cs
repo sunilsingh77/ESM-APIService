@@ -1,9 +1,8 @@
-using System;
+using EmployeeSkillsSummary.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using EmployeeSkills.API.Models;
 
-namespace EmployeeSkills.API.Data
+namespace EmployeeSkills.Infrastructure.Data
 {
     public static class SeedData
     {

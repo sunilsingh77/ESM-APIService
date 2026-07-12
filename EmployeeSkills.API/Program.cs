@@ -1,20 +1,13 @@
 using EmployeeSkills.API.Middleware;
-using EmployeeSkills.Application.DTOs.Authentication;
-using EmployeeSkills.Application.Interfaces;
-using EmployeeSkills.Application.Services;
-using EmployeeSkills.Domain.Repositories;
 using EmployeeSkills.Infrastructure.Data;
-using EmployeeSkills.Infrastructure.Persistence;
-using EmployeeSkills.Infrastructure.Repositories;
-using EmployeeSkillsSummary.Domain.Entities;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
+
 using Microsoft.OpenApi.Models;
-using System.Text;
+using EmployeeSkills.Infrastructure.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
+
+//Service Registration
+builder.Services.AddInfrastructure(builder.Configuration);
 
 // Add services to the container
 builder.Services.AddControllers();
@@ -72,68 +65,6 @@ builder.Services.AddSwaggerGen(options =>
             }
         });
 });
-
-// Configure DbContext
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-if (!string.IsNullOrEmpty(connectionString))
-{
-    builder.Services.AddDbContext<EmployeeSkillsDbContext>(options =>
-        options.UseSqlServer(connectionString));
-}
-
-// Identity
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
-{
-    options.Password.RequireDigit = true;
-    options.Password.RequiredLength = 8;
-    options.Password.RequireUppercase = true;
-    options.Password.RequireLowercase = true;
-    options.Password.RequireNonAlphanumeric = false;
-
-    options.User.RequireUniqueEmail = true;
-})
-    .AddEntityFrameworkStores<EmployeeSkillsDbContext>()
-    .AddDefaultTokenProviders();
-
-// JWT Authentication
-builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSettings.SectionName));
-var jwt = builder.Configuration.GetSection(JwtSettings.SectionName).Get<JwtSettings>()!;
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-.AddJwtBearer(options =>
-{
-    options.RequireHttpsMetadata = false;
-    options.SaveToken = true;
-    options.TokenValidationParameters =
-        new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = jwt.Issuer,
-            ValidAudience = jwt.Audience,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.Key)),
-            ClockSkew = TimeSpan.Zero
-        };
-});
-builder.Services.AddAuthorization();
-builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSettings.SectionName));
-
-//builder.Services.AddScoped<AuthService>();
-builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
-builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
-builder.Services.AddScoped<ISkillRepository, SkillRepository>();
-builder.Services.AddScoped<IEmployeeSkillRepository, EmployeeSkillRepository>();
-
-builder.Services.AddScoped<IDepartmentService, DepartmentService>();
-builder.Services.AddScoped<IEmployeeService, EmployeeService>();
-builder.Services.AddScoped<ISkillService, SkillService>();
-builder.Services.AddScoped<IEmployeeSkillService, EmployeeSkillService>();
-
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IJwtService, JwtService>();
-builder.Services.AddScoped<IHomeService, HomeService>();
 
 var app = builder.Build();
 app.UseMiddleware<GlobalExceptionMiddleware>();

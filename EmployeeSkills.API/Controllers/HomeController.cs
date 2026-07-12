@@ -1,4 +1,4 @@
-using EmployeeSkills.Application.Interfaces;
+using EmployeeSkills.Application.Home.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

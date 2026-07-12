@@ -1,5 +1,5 @@
-using EmployeeSkills.Application.DTOs.Authentication;
-using EmployeeSkills.Application.Interfaces;
+using EmployeeSkills.Application.Authentication.DTOs;
+using EmployeeSkills.Application.Authentication.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

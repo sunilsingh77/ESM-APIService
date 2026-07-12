@@ -7,12 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\EmployeeSkills.Application\EmployeeSkills.Application.csproj" />
     <ProjectReference Include="..\EmployeeSkills.Domain\EmployeeSkills.Domain.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Authentication\" />
-    <Folder Include="Identity\" />
   </ItemGroup>
 
   <ItemGroup>

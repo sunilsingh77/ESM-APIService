@@ -1,5 +1,5 @@
-using EmployeeSkills.Application.DTOs.Department;
-using EmployeeSkills.Application.Interfaces;
+using EmployeeSkills.Application.Departments.DTOs;
+using EmployeeSkills.Application.Departments.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EmployeeSkills.API.Controllers

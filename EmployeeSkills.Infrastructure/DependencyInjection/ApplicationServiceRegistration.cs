@@ -1,6 +1,7 @@
 ﻿using EmployeeSkills.Application.Authentication.Interfaces;
 using EmployeeSkills.Application.Departments.Interfaces;
 using EmployeeSkills.Application.Departments.Services;
+using EmployeeSkills.Application.Departments.Validators;
 using EmployeeSkills.Application.Employees.Interfaces;
 using EmployeeSkills.Application.Employees.Services;
 using EmployeeSkills.Application.EmployeeSkills.Interfaces;
@@ -9,6 +10,7 @@ using EmployeeSkills.Application.Home.Interfaces;
 using EmployeeSkills.Application.Home.Services;
 using EmployeeSkills.Application.Skills.Interfaces;
 using EmployeeSkills.Application.Skills.Services;
+using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace EmployeeSkills.Application.DependencyInjection;
@@ -23,6 +25,10 @@ public static class ApplicationServiceRegistration
         services.AddScoped<ISkillService, SkillService>();
         services.AddScoped<IEmployeeSkillService, EmployeeSkillService>();
         services.AddScoped<IHomeService, HomeService>();
+
+        // Register all FluentValidation validators
+        services.AddValidatorsFromAssembly(typeof(ApplicationServiceRegistration).Assembly);
+
         return services;
     }
 }

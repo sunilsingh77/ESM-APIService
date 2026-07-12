@@ -1,41 +1,87 @@
+using EmployeeSkills.Application.Common.Responses;
 using System.Net;
 using System.Text.Json;
 
-namespace EmployeeSkills.API.Middleware
+namespace EmployeeSkills.API.Middleware;
+
+public class GlobalExceptionMiddleware
 {
-    public class GlobalExceptionMiddleware
+    private readonly RequestDelegate _next;
+    private readonly ILogger<GlobalExceptionMiddleware> _logger;
+
+    public GlobalExceptionMiddleware(
+        RequestDelegate next,
+        ILogger<GlobalExceptionMiddleware> logger)
     {
-        private readonly RequestDelegate _next;
-        private readonly ILogger<GlobalExceptionMiddleware> _logger;
+        _next = next;
+        _logger = logger;
+    }
 
-        public GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExceptionMiddleware> logger)
+    public async Task InvokeAsync(HttpContext context)
+    {
+        try
         {
-            _next = next;
-            _logger = logger;
+            await _next(context);
         }
-
-        public async Task InvokeAsync(HttpContext context)
+        catch (Exception ex)
         {
-            try
-            {
-                await _next(context);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Unhandled exception for {Method} {Path}", context.Request.Method, context.Request.Path);
-                context.Response.ContentType = "application/json";
-                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            _logger.LogError(
+                ex,
+                "Unhandled exception for {Method} {Path}",
+                context.Request.Method,
+                context.Request.Path);
 
-                var response = new
+            await HandleExceptionAsync(context, ex);
+        }
+    }
+
+    private static async Task HandleExceptionAsync(
+        HttpContext context,
+        Exception exception)
+    {
+        context.Response.ContentType = "application/json";
+
+        var response = new ErrorResponse
+        {
+            StatusCode = StatusCodes.Status500InternalServerError,
+            Message = "An unexpected error occurred.",
+            ErrorCode = "SERVER_ERROR",
+            TraceId = context.TraceIdentifier
+        };
+
+        switch (exception)
+        {
+            case KeyNotFoundException:
+                response = response with
                 {
-                    title = "Server error",
-                    message = "An unexpected error occurred. Please try again later.",
-                    status = context.Response.StatusCode,
-                    traceId = context.TraceIdentifier
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = exception.Message,
+                    ErrorCode = "NOT_FOUND"
                 };
+                break;
 
-                await context.Response.WriteAsync(JsonSerializer.Serialize(response));
-            }
+            case UnauthorizedAccessException:
+                response = response with
+                {
+                    StatusCode = StatusCodes.Status401Unauthorized,
+                    Message = exception.Message,
+                    ErrorCode = "UNAUTHORIZED"
+                };
+                break;
+
+            case InvalidOperationException:
+                response = response with
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = exception.Message,
+                    ErrorCode = "INVALID_OPERATION"
+                };
+                break;
         }
+
+        context.Response.StatusCode = response.StatusCode;
+
+        await context.Response.WriteAsync(
+            JsonSerializer.Serialize(response));
     }
 }

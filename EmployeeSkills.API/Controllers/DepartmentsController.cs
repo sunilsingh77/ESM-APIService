@@ -1,11 +1,13 @@
 using EmployeeSkills.Application.Departments.DTOs;
 using EmployeeSkills.Application.Departments.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EmployeeSkills.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class DepartmentController : ControllerBase
     {
         private readonly IDepartmentService _service;

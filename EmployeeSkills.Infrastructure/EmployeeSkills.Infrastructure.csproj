@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Data\SeedData.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\EmployeeSkills.Application\EmployeeSkills.Application.csproj" />
     <ProjectReference Include="..\EmployeeSkills.Domain\EmployeeSkills.Domain.csproj" />
   </ItemGroup>
@@ -29,6 +33,10 @@
     </PackageReference>
     
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.19.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\" />
   </ItemGroup>
 
 </Project>

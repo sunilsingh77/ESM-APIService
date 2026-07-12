@@ -1,28 +1,18 @@
 using EmployeeSkills.API.Middleware;
-using EmployeeSkills.Infrastructure.Data;
-
-using Microsoft.OpenApi.Models;
+using EmployeeSkills.Application.Common.Responses;
 using EmployeeSkills.Infrastructure.DependencyInjection;
+using EmployeeSkills.Infrastructure.Persistence.Seed;
+using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//Service Registration
+//Infrastructure Service Registration
 builder.Services.AddInfrastructure(builder.Configuration);
 
 // Add services to the container
 builder.Services.AddControllers();
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAngularDev",
-        policy =>
-        {
-            policy
-                .WithOrigins("http://localhost:4200")
-                .AllowAnyHeader()
-                .AllowAnyMethod()
-                .AllowCredentials();
-        });
-});
 
 // Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
@@ -66,21 +56,57 @@ builder.Services.AddSwaggerGen(options =>
         });
 });
 
+#region Fluent Validation
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddFluentValidationClientsideAdapters();
+
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = context =>
+    {
+        var response = new ValidationResponse
+        {
+            StatusCode = StatusCodes.Status400BadRequest,
+            Message = "Validation failed.",
+            ErrorCode = "VALIDATION_ERROR",
+            TraceId = context.HttpContext.TraceIdentifier
+        };
+
+        foreach (var item in context.ModelState)
+        {
+            foreach (var error in item.Value!.Errors)
+            {
+                response.Errors.Add(new ApiValidationError
+                {
+                    Field = item.Key,
+                    Message = error.ErrorMessage
+                });
+            }
+        }
+
+        return new BadRequestObjectResult(response);
+    };
+});
+#endregion
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngularDev",
+        policy =>
+        {
+            policy
+                .WithOrigins("http://localhost:4200")
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials();
+        });
+});
+
 var app = builder.Build();
 app.UseMiddleware<GlobalExceptionMiddleware>();
-//// Seed roles and admin
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    try
-    {
-        SeedData.Initialize(services);
-    }
-    catch (Exception ex)
-    {
-        // log? skip for now
-    }
-}
+
+//Seed data for testing only
+await SeedData.InitializeAsync(app.Services);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

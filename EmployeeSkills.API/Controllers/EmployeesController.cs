@@ -7,11 +7,11 @@ namespace EmployeeSkills.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
-    public class EmployeeController : ControllerBase
+    //[Authorize]
+    public class EmployeesController : ControllerBase
     {
         private readonly IEmployeeService _service;
-        public EmployeeController(IEmployeeService service)
+        public EmployeesController(IEmployeeService service)
         {
             _service = service;
         }

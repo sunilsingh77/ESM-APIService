@@ -363,3 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 /EmployeeSkills.API/Data/Migrations
 /EmployeeSkills.API/Migrations
+/EmployeeSkills.Infrastructure/Migrations

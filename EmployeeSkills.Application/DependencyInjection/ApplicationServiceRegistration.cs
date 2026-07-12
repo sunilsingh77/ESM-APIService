@@ -1,7 +1,5 @@
-﻿using EmployeeSkills.Application.Authentication.Interfaces;
-using EmployeeSkills.Application.Departments.Interfaces;
+﻿using EmployeeSkills.Application.Departments.Interfaces;
 using EmployeeSkills.Application.Departments.Services;
-using EmployeeSkills.Application.Departments.Validators;
 using EmployeeSkills.Application.Employees.Interfaces;
 using EmployeeSkills.Application.Employees.Services;
 using EmployeeSkills.Application.EmployeeSkills.Interfaces;
@@ -17,16 +15,16 @@ namespace EmployeeSkills.Application.DependencyInjection;
 
 public static class ApplicationServiceRegistration
 {
-    public static IServiceCollection AddApplication(this IServiceCollection services)
+    public static IServiceCollection AddApplication(
+        this IServiceCollection services)
     {
-        // Application Services
         services.AddScoped<IDepartmentService, DepartmentService>();
         services.AddScoped<IEmployeeService, EmployeeService>();
         services.AddScoped<ISkillService, SkillService>();
         services.AddScoped<IEmployeeSkillService, EmployeeSkillService>();
         services.AddScoped<IHomeService, HomeService>();
 
-        // Register all FluentValidation validators
+        // Register ALL validators in the Application assembly
         services.AddValidatorsFromAssembly(typeof(ApplicationServiceRegistration).Assembly);
 
         return services;

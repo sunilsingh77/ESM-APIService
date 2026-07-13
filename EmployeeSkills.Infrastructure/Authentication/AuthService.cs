@@ -1,11 +1,14 @@
 ﻿
+using Azure.Core;
 using EmployeeSkills.Application.Authentication.DTOs;
 using EmployeeSkills.Application.Authentication.Interfaces;
+using EmployeeSkills.Application.Skills.Services;
 using EmployeeSkills.Domain.Entities;
 using EmployeeSkills.Infrastructure.Persistence;
 using EmployeeSkillsSummary.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
 
@@ -19,14 +22,14 @@ public class AuthService : IAuthService
     private readonly EmployeeSkillsDbContext _context;
     private readonly IJwtService _jwtService;
     private readonly JwtSettings _jwtSettings;
-
+    private readonly ILogger<AuthService> _logger;
     public AuthService(
         UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
         RoleManager<IdentityRole> roleManager,
         EmployeeSkillsDbContext context,
         IJwtService jwtService,
-        IOptions<JwtSettings> jwtSettings)
+        IOptions<JwtSettings> jwtSettings, ILogger<AuthService> logger)
     {
         _userManager = userManager;
         _signInManager = signInManager;
@@ -34,6 +37,7 @@ public class AuthService : IAuthService
         _context = context;
         _jwtService = jwtService;
         _jwtSettings = jwtSettings.Value;
+        _logger = logger;
     }
 
     public async Task<AuthenticationResponse> LoginAsync(UserLoginRequest dto)
@@ -69,8 +73,9 @@ public class AuthService : IAuthService
             user.Id);
 
         _context.RefreshTokens.Add(token);
-
+        
         await _context.SaveChangesAsync();
+        _logger.LogInformation($"User {dto.Email} logged in successfully.");
 
         return new AuthenticationResponse
         {
@@ -104,6 +109,7 @@ public class AuthService : IAuthService
         refreshToken.Revoke();
 
         await _context.SaveChangesAsync();
+        _logger.LogInformation($"User {refreshToken.UserId} logged out.");
     }
     public async Task<AuthenticationResponse> RefreshTokenAsync(RefreshTokenRequest request)
     {
@@ -155,7 +161,7 @@ public class AuthService : IAuthService
         _context.RefreshTokens.Add(newToken);
 
         await _context.SaveChangesAsync();
-
+        _logger.LogInformation($"Refresh token generated for user {user.Id}.");
         // 9. Return response
         return new AuthenticationResponse
         {
@@ -234,6 +240,7 @@ public class AuthService : IAuthService
         _context.RefreshTokens.Add(token);
 
         await _context.SaveChangesAsync();
+        _logger.LogInformation($"User {user.Email} registered successfully.");
 
         return new AuthenticationResponse
         {

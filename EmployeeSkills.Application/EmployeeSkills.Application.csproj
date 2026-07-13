@@ -18,8 +18,4 @@
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.11" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Authentication\Services\" />
-  </ItemGroup>
-
 </Project>

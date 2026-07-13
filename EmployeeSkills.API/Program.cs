@@ -1,3 +1,4 @@
+using EmployeeSkills.API.Extensions;
 using EmployeeSkills.API.Middleware;
 using EmployeeSkills.Application.Common.Responses;
 using EmployeeSkills.Infrastructure.DependencyInjection;
@@ -5,8 +6,11 @@ using EmployeeSkills.Infrastructure.Persistence.Seed;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.AddSerilogConfiguration(builder.Configuration);
 
 //Infrastructure Service Registration
 builder.Services.AddInfrastructure(builder.Configuration);
@@ -103,25 +107,63 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
-app.UseMiddleware<GlobalExceptionMiddleware>();
-
-//Seed data for testing only
-await SeedData.InitializeAsync(app.Services);
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+try
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(options =>
+    Log.Information("Starting Employee Skills Management API");
+    app.UseMiddleware<GlobalExceptionMiddleware>();
+
+    //Seed data for testing only
+    await SeedData.InitializeAsync(app.Services);
+
+    // Configure the HTTP request pipeline.
+    if (app.Environment.IsDevelopment())
     {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Employee Skills API v1");
+        app.UseSwagger();
+        app.UseSwaggerUI(options =>
+        {
+            options.SwaggerEndpoint("/swagger/v1/swagger.json", "Employee Skills API v1");
+        });
+    }
+
+    app.UseHttpsRedirection();
+
+    app.UseSerilogRequestLogging(options =>
+    {
+        options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+        {
+            diagnosticContext.Set("TraceId", httpContext.TraceIdentifier);
+
+            diagnosticContext.Set("User",
+                httpContext.User.Identity?.Name ?? "Anonymous");
+
+            diagnosticContext.Set("RequestHost",
+                httpContext.Request.Host.Value);
+
+            diagnosticContext.Set("RequestScheme",
+                httpContext.Request.Scheme);
+
+            diagnosticContext.Set("ClientIP",
+                httpContext.Connection.RemoteIpAddress?.ToString());
+        };
+
+        options.MessageTemplate =
+            "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
     });
+
+    app.UseMiddleware<ExceptionMiddleware>();
+
+    app.UseCors("AllowAngularDev");
+
+    app.UseAuthentication();
+    app.UseAuthorization();
+    app.MapControllers();
+    app.Run();
 }
-
-app.UseHttpsRedirection();
-
-app.UseCors("AllowAngularDev");
-app.UseAuthentication();
-app.UseAuthorization();
-app.MapControllers();
-app.Run();
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Application terminated unexpectedly");
+}
+finally
+{
+    Log.CloseAndFlush();
+}

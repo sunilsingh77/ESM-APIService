@@ -1,7 +1,10 @@
-﻿using EmployeeSkills.Application.Skills.DTOs;
+﻿using EmployeeSkills.Application.Departments.Services;
+using EmployeeSkills.Application.EmployeeSkills.Services;
+using EmployeeSkills.Application.Skills.DTOs;
 using EmployeeSkills.Application.Skills.Interfaces;
 using EmployeeSkills.Domain.Entities;
 using EmployeeSkills.Domain.Repositories;
+using Microsoft.Extensions.Logging;
 
 namespace EmployeeSkills.Application.Skills.Services
 {
@@ -9,10 +12,12 @@ namespace EmployeeSkills.Application.Skills.Services
     {
         private readonly ISkillRepository _repository;
         private readonly IUnitOfWork _unitOfWork;
-        public SkillService(ISkillRepository repository, IUnitOfWork unitOfWork)
+        private readonly ILogger<SkillService> _logger;
+        public SkillService(ISkillRepository repository, IUnitOfWork unitOfWork, ILogger<SkillService> logger)
         {
             _repository = repository;
             _unitOfWork = unitOfWork;
+            _logger = logger;
         }
         public async Task<IEnumerable<SkillDto>> GetAllAsync()
         {
@@ -54,7 +59,10 @@ namespace EmployeeSkills.Application.Skills.Services
                 dto.Category);
 
             await _repository.AddAsync(skill);
+
+            _logger.LogInformation($"Creating Skill - Skill Name {dto.Name}");
             await _unitOfWork.SaveChangesAsync();
+            _logger.LogInformation($"Skill - {skill.Id} created successfully.");
 
             return skill.Id;
         }
@@ -71,7 +79,10 @@ namespace EmployeeSkills.Application.Skills.Services
                 dto.Category);
 
             await _repository.UpdateAsync(skill);
+
+            _logger.LogInformation($"Updating Skill - {id}");
             await _unitOfWork.SaveChangesAsync();
+            _logger.LogInformation($"Skill Id - {skill.Id} updated successfully.");
         }
         public async Task DeleteAsync(int id)
         {
@@ -79,7 +90,10 @@ namespace EmployeeSkills.Application.Skills.Services
             if (skill == null)
                 throw new Exception("Skill not found.");
             await _repository.DeleteAsync(skill);
+
+            _logger.LogInformation($"Deletting Skill - {id}");
             await _unitOfWork.SaveChangesAsync();
+            _logger.LogInformation($"SkillId - {skill.Id} deleted successfully.");
         }
     }
 }

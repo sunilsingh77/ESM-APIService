@@ -7,7 +7,7 @@ namespace EmployeeSkills.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-//[Authorize]
+[Authorize]
 public class SkillsController : ControllerBase
 {
     private readonly ISkillService _service;

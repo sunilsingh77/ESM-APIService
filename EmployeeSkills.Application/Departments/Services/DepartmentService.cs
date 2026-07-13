@@ -1,7 +1,10 @@
 ﻿using EmployeeSkills.Application.Departments.DTOs;
 using EmployeeSkills.Application.Departments.Interfaces;
+using EmployeeSkills.Application.Employees.Services;
+using EmployeeSkills.Domain.Entities;
 using EmployeeSkills.Domain.Repositories;
 using EmployeeSkillsSummary.Domain.Entities;
+using Microsoft.Extensions.Logging;
 
 namespace EmployeeSkills.Application.Departments.Services
 {
@@ -9,10 +12,12 @@ namespace EmployeeSkills.Application.Departments.Services
     {
         private readonly IDepartmentRepository _repository;
         private readonly IUnitOfWork _unitOfWork;
-        public DepartmentService(IDepartmentRepository repository, IUnitOfWork unitOfWork)
+        private readonly ILogger<DepartmentService> _logger;
+        public DepartmentService(IDepartmentRepository repository, IUnitOfWork unitOfWork, ILogger<DepartmentService> logger)
         {
             _repository = repository;
             _unitOfWork = unitOfWork;
+            _logger = logger;
         }
         public async Task<IEnumerable<DepartmentDto>> GetAllAsync()
         {
@@ -49,7 +54,11 @@ namespace EmployeeSkills.Application.Departments.Services
             var department = new Department(dto.Name, dto.Description);
 
             await _repository.AddAsync(department);
+
+            _logger.LogInformation($"Creating Department - {dto.Name}");
             await _unitOfWork.SaveChangesAsync();
+            _logger.LogInformation($"Department - {department.Id} created successfully.");
+
             return department.Id;
         }
         public async Task UpdateAsync(int id, UpdateDepartmentDto dto)
@@ -61,7 +70,10 @@ namespace EmployeeSkills.Application.Departments.Services
 
             department.Update(dto.Name, dto.Description);
             await _repository.UpdateAsync(department);
+
+            _logger.LogInformation($"Updating Department - {id}");
             await _unitOfWork.SaveChangesAsync();
+            _logger.LogInformation($"DepartmentId - {department.Id} updated successfully.");
         }
         public async Task DeleteAsync(int id)
         {
@@ -70,7 +82,10 @@ namespace EmployeeSkills.Application.Departments.Services
                 throw new Exception("Department not found.");
 
             await _repository.DeleteAsync(department);
+
+            _logger.LogInformation($"Deletting DepartmentId - {id}");
             await _unitOfWork.SaveChangesAsync();
+            _logger.LogInformation($"DepartmentId - {department.Id} deleted successfully.");
         }
     }
 }

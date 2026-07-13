@@ -2,6 +2,7 @@
 using EmployeeSkills.Application.Employees.Interfaces;
 using EmployeeSkills.Domain.Entities;
 using EmployeeSkills.Domain.Repositories;
+using Microsoft.Extensions.Logging;
 
 namespace EmployeeSkills.Application.Employees.Services
 {
@@ -9,10 +10,12 @@ namespace EmployeeSkills.Application.Employees.Services
     {
         private readonly IEmployeeRepository _repository;
         private readonly IUnitOfWork _unitOfWork;
-        public EmployeeService(IEmployeeRepository repository, IUnitOfWork unitOfWork)
+        private readonly ILogger<EmployeeService> _logger;
+        public EmployeeService(IEmployeeRepository repository, IUnitOfWork unitOfWork, ILogger<EmployeeService> logger)
         {
             _repository = repository;
             _unitOfWork = unitOfWork;
+            _logger = logger;
         }
 
         public async Task<IEnumerable<EmployeeDto>> GetAllAsync()
@@ -71,7 +74,10 @@ namespace EmployeeSkills.Application.Employees.Services
                 dto.HireDate);
 
             await _repository.AddAsync(employee);
+
+            _logger.LogInformation($"Creating EmployeeName - {dto.FirstName} {dto.LastName}");
             await _unitOfWork.SaveChangesAsync();
+            _logger.LogInformation($"EmployeeId - {employee.Id} created successfully.");
 
             return employee.Id;
         }
@@ -93,7 +99,10 @@ namespace EmployeeSkills.Application.Employees.Services
                 dto.HireDate);
 
             await _repository.UpdateAsync(employee);
+
+            _logger.LogInformation($"Updating EmployeeId - {employee.Id}");
             await _unitOfWork.SaveChangesAsync();
+            _logger.LogInformation($"EmployeeId - {employee.Id} updated successfully.");
         }
 
         public async Task DeleteAsync(int id)
@@ -104,7 +113,10 @@ namespace EmployeeSkills.Application.Employees.Services
                 throw new Exception("Employee not found.");
 
             await _repository.DeleteAsync(employee);
+
+            _logger.LogInformation($"Deletting EmployeeId - {id}");
             await _unitOfWork.SaveChangesAsync();
+            _logger.LogInformation($"EmployeeId - {employee.Id} deleted successfully.");
         }
     }
 }
